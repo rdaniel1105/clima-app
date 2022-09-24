@@ -64,13 +64,13 @@ const leerInput = async (message) => {
   return place;
 };
 
-const listarLugares = async (lugares = []) => {
-  const choices = lugares.map((lugar, i) => {
+const searchResultsList = async (lugares = []) => {
+  const choices = lugares.map((place, i) => {
     const idx = `${i + 1}.`.green;
 
     return {
-      value: lugar.id,
-      name: `${idx} ${lugar.nombre}`,
+      value: place.id,
+      name: `${idx} ${place.place_name}`,
     };
   });
 
@@ -143,7 +143,7 @@ module.exports = {
   inquirerMenu,
   pausa,
   leerInput,
-  listarLugares,
+  searchResultsList,
   confirmar,
   mostrarListadoChecklist,
 };

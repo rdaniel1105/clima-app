@@ -4,7 +4,7 @@ const {
   leerInput,
   inquirerMenu,
   pausa,
-  listarLugares,
+  searchResultsList,
 } = require("./helpers/inquirer");
 const { Busquedas } = require("./models/busquedas");
 require("colors");
@@ -24,18 +24,18 @@ const main = async () => {
           const placeInfo = await busquedas.pullPlaceData(place);
 
           // Seleccionar lugar
-          const placeId = await listarLugares(placeInfo);
+          const placeId = await searchResultsList(placeInfo);
           if (placeId === "0") continue;
           const placeSelected = placeInfo.find((l) => l.id === placeId);
           // Guardar en DB
-          busquedas.addToSearchHistory(placeSelected.nombre);
+          busquedas.addToSearchHistory(placeSelected.place_name);
           // console.log(lugarSelected);
           // Clima
           const weatherInfo = await busquedas.pullPlaceWeather(placeSelected);
           // Mostrar resultados
           console.clear();
           console.log("\nInformación de la ciudad:\n".green);
-          console.log("Ciudad: ", placeSelected.nombre);
+          console.log("Ciudad: ", placeSelected.place_name);
           console.log("Lat: ", placeSelected.lat);
           console.log("Lng: ", placeSelected.lng);
           console.log("Temperatura: ", weatherInfo.temp);

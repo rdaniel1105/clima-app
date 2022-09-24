@@ -69,17 +69,17 @@ class Busquedas {
     });
   }
 
-  async pullPlaceData(lugar = "") {
+  async pullPlaceData(place = "") {
     // console.log('ciudad: ',lugar);
 
     try {
       // Petición HTTP
       const instace = axios.create({
-        baseURL: process.env.MAPBOX_URL + `${lugar}.json`,
+        baseURL: process.env.MAPBOX_URL + `${place}.json`,
         params: this.paramsMapBox,
       });
 
-      const resp = await instace.get();
+      const response = await instace.get();
 
       // Hacerlo normal, pero también se puede regresar un objeto implícito
       // return resp.data.features.map( lugar => {
@@ -91,11 +91,11 @@ class Busquedas {
       //     }
       // })
 
-      return resp.data.features.map((lugar) => ({
-        id: lugar.id,
-        nombre: lugar.place_name,
-        lng: lugar.center[0],
-        lat: lugar.center[1],
+      return response.data.features.map((placeData) => ({
+        id: placeData.id,
+        place_name: placeData.place_name,
+        lng: placeData.center[0],
+        lat: placeData.center[1],
       }));
     } catch (error) {
       throw error;
