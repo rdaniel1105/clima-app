@@ -1,59 +1,67 @@
-require('dotenv').config();
+require("dotenv").config();
 
-const { leerInput, inquirerMenu, pausa, listarLugares } = require("./helpers/inquirer");
+const {
+  leerInput,
+  inquirerMenu,
+  pausa,
+  listarLugares,
+} = require("./helpers/inquirer");
 const { Busquedas } = require("./models/busquedas");
-require('colors')
+require("colors");
 
+const main = async () => {
+  const busquedas = new Busquedas();
+  let option;
+  do {
+    option = await inquirerMenu();
 
-const main = async() => {
-    
-    const busquedas = new Busquedas();
-    let opt;
-    do {
-        opt = await inquirerMenu();
-        
-        switch (opt) {
-            case 1:
-                
-                // Mostrar mensaje
-                const termino = await leerInput('Ciudad: ');
-                // Buscar lugares
-                const lugares = await busquedas.ciudad(termino);
-                
-                // Seleccionar lugar
-                const idSeleccionado = await listarLugares(lugares);
-                if ( idSeleccionado === '0') continue;
-                const lugarSelected = lugares.find( l => l.id === idSeleccionado );
-                // Guardar en DB
-                busquedas.agregarHistorial(lugarSelected.nombre);
-                // console.log(lugarSelected);
-                // Clima
-                const climaResults = await busquedas.clima(lugarSelected);
-                // Mostrar resultados
-                console.clear();
-                console.log('\nInformación de la ciudad:\n'.green);
-                console.log('Ciudad: ', lugarSelected.nombre );
-                console.log('Lat: ', lugarSelected.lat );
-                console.log('Lng: ', lugarSelected.lng );
-                console.log('Temperatura: ', climaResults.temp);
-                console.log('Mínima: ', climaResults.min);
-                console.log('Máxima: ', climaResults.max);
-                console.log('Sensación: ', climaResults.sensation);
-                break;
-        
-            case 2:
-                //busquedas.historial.forEach( (lugar,i) => {
-                busquedas.historialCapitalizado.forEach( (lugar,i) => {
-                    const idx = `${ i+1}.`.green;
-                    console.log(`${idx} ${lugar}`);
-                })
-                
-                break;
-        }    
-        if (opt !== 0) await pausa();
-    } while (opt !== 0);
-    
+    switch (option) {
+      case 1:
+        try {
+          // Mostrar mensaje
+          const place = await leerInput("Ciudad: ");
+          // Buscar lugares
+          const placeInfo = await busquedas.pullPlaceData(place);
 
-}
+          // Seleccionar lugar
+          const placeId = await listarLugares(placeInfo);
+          if (placeId === "0") continue;
+          const placeSelected = placeInfo.find((l) => l.id === placeId);
+          // Guardar en DB
+          busquedas.addToSearchHistory(placeSelected.nombre);
+          // console.log(lugarSelected);
+          // Clima
+          const weatherInfo = await busquedas.pullPlaceWeather(placeSelected);
+          // Mostrar resultados
+          console.clear();
+          console.log("\nInformación de la ciudad:\n".green);
+          console.log("Ciudad: ", placeSelected.nombre);
+          console.log("Lat: ", placeSelected.lat);
+          console.log("Lng: ", placeSelected.lng);
+          console.log("Temperatura: ", weatherInfo.temp);
+          console.log("Mínima: ", weatherInfo.min);
+          console.log("Máxima: ", weatherInfo.max);
+          console.log("Sensación: ", weatherInfo.sensation);
+          break;
+        } catch (error) {
+          throw error;
+        }
+
+      case 2:
+        //busquedas.historial.forEach( (lugar,i) => {
+        busquedas.titleCaseArray.forEach((lugar, i) => {
+          const idx = `${i + 1}.`.green;
+          console.log(`${idx} ${lugar}`);
+        });
+
+        break;
+    }
+    try {
+      if (option !== 0) await pausa();
+    } catch (error) {
+      throw error;
+    }
+  } while (option !== 0);
+};
 
 main();
